@@ -58,7 +58,7 @@ export type DeleteEventParams = {
 
 export type GetAllEventsParams = {
     query: string
-    category: string
+    categoryName: string
     limit: number
     page: number
 }
@@ -134,6 +134,12 @@ export type GetOrdersByUserParams = {
 // ====== URL QUERY PARAMS
 export type UrlQueryParams = {
     params: string
+    key: string
+    value: string | null
+}
+
+export type UrlQueryParams2 = {
+    params: 
     key: string
     value: string | null
 }

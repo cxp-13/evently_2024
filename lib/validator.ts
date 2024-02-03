@@ -8,7 +8,7 @@ export const eventFormSchema = z.object({
     imageUrl: z.string().url("Invalid image url"),
     startDateTime: z.date(),
     endDateTime: z.date(),
-    categoryId: z.string(),
+    categoryId: z.string().min(3, "category not be null"),
     price: z.string(),
     isFree: z.boolean(),
     url:z.string().url("Invalid url"),

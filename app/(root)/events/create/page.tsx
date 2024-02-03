@@ -1,13 +1,23 @@
 import EventForm from '@/components/shared/EventForm'
-import { auth } from '@clerk/nextjs'
-import React from 'react'
+import { auth, useUser } from '@clerk/nextjs'
+import React, { useEffect } from 'react'
 
 const CreateEvent = () => {
-    const { sessionClaims } = auth()
+    const authRes = auth()
+    console.log("authRes", authRes);
+    
+    // const curUserId = sessionClaims?.userId as string
 
-    const userId = sessionClaims?.userId as string
+    // const { isSignedIn, user, isLoaded } = useUser();
+    // const curUserId = user?.publicMetadata.userId || ""
+    const curUserId = authRes.sessionClaims!.userId
 
+    // useEffect(()=>{
+    //     console.log("user", user);
+    //     console.log("authRes", authRes);
 
+        
+    // })
 
     return (
         <>
@@ -18,7 +28,7 @@ const CreateEvent = () => {
             </section>
 
             <section className='wrapper py-8'>
-                <EventForm userId={userId} type="Create"/>
+                <EventForm userId={curUserId as string} type="Create"/>
             </section>
         </>
     )

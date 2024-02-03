@@ -1,4 +1,4 @@
-import React, { startTransition, useState } from 'react'
+import React, { startTransition, useCallback, useEffect, useState } from 'react'
 
 import {
     Select,
@@ -7,7 +7,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select"
-import { ICategory } from '@/lib/database/models/category.model'
+import { ICategory, check } from '@/lib/database/models/category.model'
 
 import {
     AlertDialog,
@@ -21,6 +21,8 @@ import {
     AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
 import { Input } from '../ui/input'
+import { addCategory, getAllCategory } from '@/lib/actions/category.actions'
+import { Separator } from '@radix-ui/react-separator'
 
 
 
@@ -34,9 +36,30 @@ const Dropdown = ({ value, onChangeHandler }: DropdownProps) => {
     const [categories, setCategories] = useState<ICategory[]>([]);
     const [newCategory, setNewCategory] = useState("")
 
-    const handleAddCategory = () => {
-
+    const handleAddCategory = async () => {
+        console.log("handleAddCategory");
+        let category = await addCategory({ categoryName: newCategory.trim() })
+        console.log("category添加成功", category);
+        
+        if (category) {
+            setCategories([...categories, category])
+        }
     }
+
+    useEffect(() => {
+        const fetchAllCategory = async () => {
+            try {
+                const res = await getAllCategory()
+                console.log("getAllCategory--res", res);
+                setCategories(res || [])
+            } catch (error) {
+                console.log("getAllCategory--error", error);
+            }
+        }
+        fetchAllCategory()
+    }, [])
+
+    
 
     return (
         <Select onValueChange={onChangeHandler} defaultValue={value}>
@@ -52,7 +75,9 @@ const Dropdown = ({ value, onChangeHandler }: DropdownProps) => {
 
                 <AlertDialog>
                     <AlertDialogTrigger className='p-medium-14 flex w-full rounded-sm py-3 pl-8 
-                    text-primary-500 hover:bg-primary-50 focus:text-primary-500'>Open</AlertDialogTrigger>
+                    text-primary-500 hover:bg-primary-50 focus:text-primary-500'>
+                        Add New
+                    </AlertDialogTrigger>
                     <AlertDialogContent className='bg-white '>
                         <AlertDialogHeader>
                             <AlertDialogTitle>New Category</AlertDialogTitle>
@@ -64,7 +89,7 @@ const Dropdown = ({ value, onChangeHandler }: DropdownProps) => {
                         </AlertDialogHeader>
                         <AlertDialogFooter>
                             <AlertDialogCancel>Cancel</AlertDialogCancel>
-                            <AlertDialogAction onClick={() => startTransition(handleAddCategory)}>Add</AlertDialogAction>
+                            <AlertDialogAction onClick={() => { handleAddCategory() }}>Add</AlertDialogAction>
                         </AlertDialogFooter>
                     </AlertDialogContent>
                 </AlertDialog>

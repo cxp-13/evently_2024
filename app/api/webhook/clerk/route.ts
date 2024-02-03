@@ -28,6 +28,9 @@ export async function POST(req: Request) {
     }
 
     // Get the body
+    // const text = await req.text()
+    // console.log("req.text()------clerk", text);
+    
     const payload = await req.json()
     const body = JSON.stringify(payload);
 
@@ -78,7 +81,7 @@ export async function POST(req: Request) {
         }
 
         const newUser = await createUser(user);
-
+// 用于添加event时，获取当前用户在db中的id
         if (newUser) {
             await clerkClient.users.updateUserMetadata(id, {
                 publicMetadata: {

@@ -57,10 +57,11 @@ export const formatPrice = (price: string) => {
 }
 
 export function formUrlQuery({ params, key, value }: UrlQueryParams) {
+  // 获得{x:y}
   const currentUrl = qs.parse(params)
-
+  // 获得{x:y, key:value}
   currentUrl[key] = value
-
+  // 把url和query进行连接 ，中间加上？
   return qs.stringifyUrl(
     {
       url: window.location.pathname,
@@ -69,6 +70,8 @@ export function formUrlQuery({ params, key, value }: UrlQueryParams) {
     { skipNull: true }
   )
 }
+
+
 
 export function removeKeysFromQuery({ params, keysToRemove }: RemoveUrlQueryParams) {
   const currentUrl = qs.parse(params)

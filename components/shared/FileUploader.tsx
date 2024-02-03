@@ -1,6 +1,5 @@
 import { OurFileRouter } from '@/app/api/uploadthing/core'
 import React, { Dispatch, SetStateAction, useCallback, useState } from 'react'
-// Note: `useUploadThing` is IMPORTED FROM YOUR CODEBASE using the `generateReactHelpers` function
 import { useDropzone } from "@uploadthing/react/hooks";
 import { generateClientDropzoneAccept } from "uploadthing/client";
 import { generateReactHelpers } from "@uploadthing/react/hooks";

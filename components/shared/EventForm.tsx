@@ -28,68 +28,120 @@ import DatePicker from "react-datepicker";
 
 import "react-datepicker/dist/react-datepicker.css";
 import { Checkbox } from "../ui/checkbox"
+import CreateEvent from "@/app/(root)/events/create/page"
+import { formatPrice } from "@/lib/utils"
+import { currentUser } from "@clerk/nextjs"
+import { createEvent, updateEvent } from "@/lib/actions/event.actions"
+import { useRouter } from 'next/navigation'
+import { IEvent } from "@/lib/database/models/event.model"
+import UpdateEvent from "@/app/(root)/events/[id]/update/page"
 
 
 type EventFormProps = {
   userId: string,
-  type: "Create" | "Update"
+  type: "Create" | "Update",
+  event?: IEvent,
+  eventId?: string
 }
 
-const EventForm = ({ userId, type }: EventFormProps) => {
+const EventForm = ({ userId, type, event, eventId }: EventFormProps) => {
+  const initialValues = event && type === 'Update' 
+    ? { 
+      ...event, 
+      startDateTime: new Date(event.startDateTime), 
+      endDateTime: new Date(event.endDateTime) 
+    }
+    : eventDefaultValues;
 
-
-
-
-  const initialValues = eventDefaultValues
+  const router = useRouter()
 
   const [files, setFiles] = useState<File[]>([])
 
   const { startUpload, permittedFileInfo } = useUploadThing(
     "imageUploader",
     {
-      onClientUploadComplete: (e) => {
-        console.log("FileUploader--onClientUploadComplete---e", e);
+      onClientUploadComplete: (res) => {
+        console.log("FileUploader--onClientUploadComplete---res", res);
         console.log("useUploadThing-onClientUploadComplete");
-        alert("useUploadThing-onClientUploadComplete")
-
       },
       onUploadError: (error: Error) => {
         console.log("error", error);
-        
         console.log("useUploadThing-onUploadError");
-        alert("useUploadThing-onUploadError")
-
       },
       onUploadBegin: () => {
         console.log("useUploadThing-onUploadBegin");
-
       },
-     
     },
   );
 
-  // 1. Define your form.
   const form = useForm<z.infer<typeof eventFormSchema>>({
     resolver: zodResolver(eventFormSchema),
     defaultValues: initialValues
   })
 
-  // 2. Define a submit handler.
   async function onSubmit(values: z.infer<typeof eventFormSchema>) {
-    // Do something with the form values.
-    // ✅ This will be type-safe and validated.
-    console.log(values)
-    let res = await startUpload(files)
-    console.log("onSubmit----res", res);
 
+    console.log("values", values)
+    // 上传图片
+    if (files.length > 0) {
+      let filesResponse = await startUpload(files)
+      console.log("filesResponse", filesResponse);
+      if (!filesResponse || filesResponse.length == 0) {
+        throw new Error("上传图片失败")
+      } else {
+        values.imageUrl = filesResponse[0].url
+      }
+    }
+
+    if(values.isFree){
+      values.price = "0"
+    }
+
+    switch (type) {
+
+      case "Create": {
+        let newEvent = await createEvent({
+          event: { ...values },
+          userId,
+          path: "/profile"
+        })
+
+        if (newEvent) {
+          form.reset()
+          router.push(`/events/${newEvent._id}`)
+        }
+        break;
+      }
+
+      case "Update": {
+
+        if (!eventId){
+          router.back()
+          return
+        }
+
+        let updatedEvent = await updateEvent({
+          userId,
+          event: { ...values, _id: eventId },
+          path: `/events/${eventId}`
+        })
+
+        if (updatedEvent) {
+          form.reset()
+          router.push(`/events/${updatedEvent._id}`)
+        }
+        break;
+      }
+
+      default:
+        break;
+    }
   }
 
 
   return (
-
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-5">
-
         <div className="flex flex-col gap-5 md:flex-row">
           <FormField
             control={form.control}
@@ -275,7 +327,7 @@ const EventForm = ({ userId, type }: EventFormProps) => {
                             <div className="flex items-center">
                               <label htmlFor="isFree" className="whitespace-nowrap pr-3 
                 leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">Free Ticket</label>
-                              <Checkbox id="isFree" className="mr-2 h-5 w-5 border-2 border-primary-500" />
+                              <Checkbox id="isFree" className="mr-2 h-5 w-5 border-2 border-primary-500" onCheckedChange={field.onChange} checked={field.value} />
                             </div>
                           </FormControl>
                           <FormMessage />

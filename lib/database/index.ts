@@ -3,26 +3,15 @@ import mongoose from 'mongoose';
 
 const MONGODB_URI = process.env.MONGODB_URI;
 
-// export default async function connectToDatabase() {
+// async function connectToDatabase() {
 //     try {
-//         if(MONGODB_URI === undefined){
+//         if (MONGODB_URI === undefined) {
 //             console.log('MONGODB_URI is undefined');
 //             return
 //         }
-//         const conn = await mongoose.createConnection(MONGODB_URI).
-//             asPromise();
+//         const conn = await mongoose.createConnection(MONGODB_URI).asPromise();
 //         let curState = conn.readyState
-//         console.log("curState", curState);
-
-//         if (curState === 1) {
-//             console.log('Have connect to MongoDB');
-//         } else {
-//             await mongoose.connect(MONGODB_URI, {
-//                 dbName: 'evently',
-//                 bufferCommands: true,
-//             });
-//             console.log('Connected to MongoDB');
-//         }
+//         console.log("curDatabaseState", curState);
 //     } catch (error: any) {
 //         console.error('Error connecting to MongoDB:', error.message);
 //     }
@@ -30,7 +19,7 @@ const MONGODB_URI = process.env.MONGODB_URI;
 
 let cached = (global as any).mongoose || { conn: null, promise: null };
 
- const connectToDatabase = async () => {
+const connectToDatabase = async () => {
     if (cached.conn) return cached.conn;
 
     if (!MONGODB_URI) throw new Error('MONGODB_URI is missing');
