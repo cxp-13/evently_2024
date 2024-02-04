@@ -1,5 +1,7 @@
-### Origin Project: https://www.youtube.com/watch?v=zgGhzuBZOQg
+### Origin Project: [https://www.youtube.com/watch?v=zgGhzuBZOQg](https://github.com/adrianhajdin/event_platform)
 
+#### Major Updates：
+1. 
 This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
 ## Getting Started
